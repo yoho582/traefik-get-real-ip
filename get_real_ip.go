@@ -41,7 +41,7 @@ type GetRealIP struct {
 
 // New creates and returns a new realip plugin instance.
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-	log("☃️  Config loaded.(%d) %v", len(config.Proxy), config)
+	log("Config loaded.(%d) %v", len(config.Proxy), config)
 
 	return &GetRealIP{
 		next:  next,
@@ -56,7 +56,7 @@ func (g *GetRealIP) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	var realIPStr string
 	for _, proxy := range g.proxy {
 		if proxy.ProxyHeadername == "*" || req.Header.Get(proxy.ProxyHeadername) == proxy.ProxyHeadervalue {
-			log("🐸  Current Proxy：%s(%s)", proxy.ProxyHeadervalue, proxy.ProxyHeadername)
+			log("Current Proxy：%s(%s)", proxy.ProxyHeadervalue, proxy.ProxyHeadername)
 
 			// CDN来源确定
 			nIP := req.Header.Get(proxy.RealIP)
@@ -66,7 +66,7 @@ func (g *GetRealIP) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			forwardedIPs := strings.Split(nIP, ",") // 从头部获取到IP并分割（主要担心xff有多个IP）
 
 			// 只有单个IP也只会返回单个IP slice
-			log("👀  IPs:'%v' %d", forwardedIPs, len(forwardedIPs))
+			log("IPs:'%v' %d", forwardedIPs, len(forwardedIPs))
 			// 如果有多个，得到第一个 IP
 			for i := 0; i <= len(forwardedIPs)-1; i++ {
 				trimmedIP := strings.TrimSpace(forwardedIPs[i])
@@ -81,7 +81,7 @@ func (g *GetRealIP) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		// 获取到后直接设定 realIP
 		if realIPStr != "" {
 			if proxy.OverwriteXFF {
-				log("🐸  Modify XFF to:%s", realIPStr)
+				log("Modify XFF to:%s", realIPStr)
 				req.Header.Set(xForwardedFor, realIPStr)
 			}
 			req.Header.Set(xRealIP, realIPStr)
